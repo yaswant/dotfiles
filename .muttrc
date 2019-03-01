@@ -1,0 +1,172 @@
+##  O365 Configuration --------------------------------------------------------
+### Connection
+set ssl_starttls = yes                  # on servers advertising the capability
+set ssl_force_tls = yes                 # encrypt all connections to remote servers
+# set ssl_use_sslv3 = yes               #
+set timeout = 60                        # wait for input before time out
+set mail_check = 5                      # look for new mail (in seconds)
+
+### Incoming (IMAP) connection
+set imap_user = "e.mail@add.re.ss"
+set imap_pass = "xxxxxxxxxxxxxxxx"      # via  https://myapps.microsoft.com
+set imap_authenticators = "login"       # IMAP authentication method
+set folder = "imaps://outlook.office365.com:993"
+set mbox = "+INBOX"                     #
+set postponed = "+Drafts"               # draft messages
+set spoolfile = "+INBOX"                #
+set record = "+Sent Items"              #
+set imap_check_subscribed               #
+set imap_peek = yes                     # avoid marking mail as read while fetching
+set imap_idle = yes                     # use the IMAP IDLE extension to check for new mail
+unset imap_passive                      #
+
+### Outgoing (SMTP) connection
+set realname = "Real Name"              # name to use when sending messages
+set from = "e.mail@add.re.ss"
+set smtp_pass = "xxxxxxxxxxxxxxxx"      # O365 app authentication
+set smtp_authenticators = "login"       # SMTP authentication method
+set smtp_url = "smtp://e.mail@add.re.ssk@smtp.office365.com:587/"
+
+mailboxes
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+
+##  Caches --------------------------------------------------------------------
+set header_cache=~/.mutt/cache          # path to cache message headers
+set message_cachedir=~/.mutt/cache      # path to cache copies of messages
+set certificate_file=~/.mutt/cert       # certificate file
+set header_cache_compress = no          # don't compress cached database
+set read_inc = 200                      # message fetch increment
+
+
+##  Index ---------------------------------------------------------------------
+set date_format = "%F %H:%M"            #
+set index_format = "%-3C [%Z] %D %4c %2M | %-20.20F | %s"
+set strict_threads = "yes"              #
+set sort = reverse-threads              # primary sorting method
+set sort_aux = reverse-date-received    # how to sort sub-threads
+set sort_aux = date                     # date of the last message in thread
+set sort = "threads"                    #
+set sort_browser = "reverse-date"       #
+set sort_aux = "last-date-received"     #
+
+
+##  Pager Preview/Read --------------------------------------------------------
+auto_view text/html                     #
+auto_view text/calendar                 #
+auto_view text/x-vcard                  #
+alternative_order text/calendar text/plain text/*
+
+ignore *                                # ignore all lines by default
+# unignore from: subject: to: cc: date:   # show header fields
+unignore subject: date: from:           # show header fields
+unignore priority: importance:          # priorities should be heeded
+hdr_order Subject From Date To Cc       #
+# my_hdr Reply-to:alt.email@add.re.ss   # alt email to receive reply
+set wrap = 115                          # word wrap at column
+# set nosmart_wrap                      # don't want smart wrapping
+# set smart_wrap = yes                    #
+set nomarkers                           # don't want any wrap markers
+set pager_index_lines = 10              # number of index lines to show
+set pager_context = 3                   # number of context lines to show
+set pager_stop = yes                    # don't go to next message automatically
+set menu_scroll = yes                   # scroll in menus
+set tilde = yes                         # show tildes like in vim
+set markers = no                        # no ugly plus signs
+set to_chars=" +TCF "                   #
+set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
+set rfc2047_parameters = yes
+
+# set charset= iso-8859-1                 # one of those days in England...
+# set display_filter="tr '\240' ''"       # avoid display thin space as \240
+# set display_filter="tr '\302' ' '"      # avoid display thick space as \302
+# set noallow_8bit                        # 8-bit isn't safe via Daemon.
+# set display_filter="tr '\267' '.'"      # replace ·
+
+
+# set pipe_decode = yes
+# macro index,pager U "set wait_key\ngrep -iPh 'https?://.+?\\s'\nunset wait_key\n" "Show URLs in message"
+
+##  Compose -------------------------------------------------------------------
+set editor="nano -s hunspell -t +8"
+set edit_headers                        # show headers when composing
+set fast_reply                          # skip to compose when replying
+set askcc                               # ask for CC:
+set fcc_attach                          # save attachments with the body
+set forward_format = "Fwd: %s"          # format of subject when forwarding
+set forward_decode                      # decode when forwarding
+set attribution = "[%d] %n:\\n"         # format of quoting header
+set reply_to                            # reply to Reply to: field
+set include                             # include message in replies
+set forward_quote                       # include message in forwards
+set compose_format = ""                 #
+set recall = ask-no				              # recall postponed message?
+set mime_forward = ask-yes              # forward attachments as a separate message/rfc822 MIME part
+set mime_forward_rest                   #
+
+
+##  Misc settings -------------------------------------------------------------
+set allow_ansi = yes                    # interpret ANSI color codes in messages
+set use_envelope_from = yes             # avoids "userid@eldnnn" type addresses
+set status_on_top                       # status bar on top
+set delete = yes                        # delete marked messages on exit
+set sendmail_wait = -1                  # don't wait around for sendmail
+set noconfirmappend                     # just append, don't hassle me
+set sleep_time = 0                      # speed up folders switch
+unset mark_old                          # don't mark new unread messages as old
+unset collapse_unread                   #
+
+
+## Key bindings and Macros ----------------------------------------------------
+bind index - collapse-thread
+bind index _ collapse-all
+bind index <F5> imap-fetch-mail
+bind index G imap-fetch-mail
+macro index <F72> "<tag-message>"   # Shift+↓ to tag messages (def: t)
+macro index .    "<change-folder> =INBOX"<enter>
+macro index \Ci  "<change-folder> =INBOX"<enter>
+macro index \Cd  "<change-folder> =Drafts"<enter>
+macro index \Ck  "<change-folder> =Junk<quote-char> Email"<enter>
+macro index \Cl  "<change-folder> =Lightning"<enter>
+macro index \Ct  "<change-folder> =Sent<quote-char> Items"<enter>
+macro index \Cx  "<change-folder> =Deleted<quote-char> Items"<enter>
+### mark thread for deletion (Shift+Delete)
+macro index <F119> <delete-thread><next-unread><current-middle>
+### handle links properly before opening in UrlView (default key-binding Cb)
+macro index,pager U "<enter-command>set pipe_decode = yes<enter><pipe-message>urlview<enter><enter-command>set pipe_decode = no<enter>""view URLs"
+### save attachments to /downloads
+macro attach s <save-entry><bol>/downloads/<eol>
+### Move deleted messages into the "Deleted Items" folder
+folder-hook . 'macro index <Delete> "<save-message>=Deleted <enter><sync-mailbox>"'
+folder-hook . 'macro index d "<save-message>=Deleted <enter><sync-mailbox>"'
+# folder-hook . 'macro index <F119> "<save-message>=Deleted <enter><sync-mailbox>"'
+
+
+# Training spamassassin - we don't have this
+# (be sure to modify spam destination, esc-d for spam, esc-u for unspam,
+# esc-t to test) See also `pipe_decode +
+#     pipe_split`!!!
+# macro index \ed "<enter-command>unset wait_key\n<pipe-entry>sa-learn --spam\n<enter-command>set wait_key\n<save-message>=Junk<quote-char> Email\n" "Tags as SPAM"
+# macro index \eu "<pipe-entry>sa-learn --ham\n<enter-command>set wait_key\n<save-message>=inbox\n" "Untags as SPAM"
+# macro index \et "<pipe-entry>spamassassin -t\n<enter-command>set wait_key\n" "Tests if it is SPAM"
+
+
+##  Colour scheme -------------------------------------------------------------
+source ~/.mutt/color-scheme/mutt-colors-solarized-dark-16.muttrc
+
+
+## Print (to PDF) and show ----------------------------------------------------
+set locale = "en_GB.UTF-8"              #
+set print = yes                         # don't ask just print
+set print_split                         # command specified by $print_command is executed once for each message which is to be printed
+set print_command = ~/bin/txt2pdf       # use enscript | ps2pdf and show pdf
+# set print_command = "a2ps -1gEmail --borders=no --strip=3 "
+# set print_command = "InputSlot=Tray1 PageSize=A4"
+
+
+## Get mutt to display its version on start-up --------------------------------
+push <show-version>
+
+
+## Aliases --------------------------------------------------------------------
+alias home Home Email <alt.email@add.re.ss>

@@ -1,0 +1,12 @@
+set smtp-use-starttls
+set ssl-verify=ignore
+set smtp-auth=login
+set smtp=smtp.office365.com:587
+set from=<e.mail@add.re.ss>
+set smtp-auth-user=<e.mail@add.re.ss>
+set smtp-auth-password=<xxxxxxxxxxxxxxxx>
+set ssl-verify=ignore
+set nss-config-dir=~/.certificates
+
+# keep a record of sent mails
+set record=~/Mail/sent

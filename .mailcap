@@ -1,0 +1,36 @@
+# links/elinks for: text, html
+text/html; links %s; nametemplate=%s.html
+text/html; links -dump %s; nametemplate=%s.html; copiousoutput
+# text/html; links -dump-charset iso-8859-1 -dump %s; nametemplate=%s.html; copiousoutput
+# text/html; /usr/bin/xdg-open %s; nametemplate=%s.html; copiousoutput
+# w3m -I %{charset} -T text/html -dump; copiousoutput
+
+# evince (or gv if evince failed) for: pdf
+#application/pdf; { set -m \; /bin/mv -T %s %s.mv \; ( evince %s.mv \; /bin/rm %s.mv \; ) & } \; disown -a
+application/pdf;mutt_bgrun evince '%s'; test=test -n "$DISPLAY"
+application/pdf;gv '%s'; test=test -n "$DISPLAY"
+
+# libreoffice for: Open/LibreOffice documents
+application/vnd.oasis.opendocument.text;mutt_bgrun ooffice %s; test=test -n "$DISPLAY"
+
+
+# libreoffice for: MS Office files doc[x], ppt[x]
+application/vnd.ms-office;mutt_bgrun ooffice %s; test=test -n "$DISPLAY"
+application/msword;mutt_bgrun ooffice %s; test=test -n "$DISPLAY"
+application/octet-stream;mutt_bgrun ooffice %s; test=test -n "$DISPLAY"
+application/vnd.openxmlformats-officedocument.wordprocessingml.document;mutt_bgrun ooffice %s; test=sh -c 'test $DISPLAY'
+application/ppt;mutt_bgrun ooffice %s; test=test -n "$DISPLAY"
+application/x-mspowerpoint;mutt_bgrun ooffice %s; test=test -n "$DISPLAY"
+application/vnd.ms-powerpoint;mutt_bgrun ooffice %s; test=test -n "$DISPLAY"
+application/vnd.openxmlformats-officedocument.presentationml.presentation;mutt_bgrun ooffice %s; test=test -n "$DISPLAY"
+
+# imagemagick/display for: png, gif
+image/png;mutt_bgrun display %s; test=test -n "$DISPLAY"
+image/gif;mutt_bgrun display %s; test=test -n "$DISPLAY"
+
+# text/calendar
+# text/calendar; mutt_bgrun cal365-webapp %s; test=test -n "$DISPLAY"
+text/calendar; mutt_bgrun cal365-webapp %s; copiousoutput;
+text/x-vcard; mutt_bgrun cal365-webapp %s; test=test -n "$DISPLAY"
+application/vcs; mutt_bgrun cal365-webapp %s; test=test -n "$DISPLAY"
+application/ics; mutt_bgrun cal365-webapp %s; test=test -n "$DISPLAY"

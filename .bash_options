@@ -1,0 +1,44 @@
+## Grep colours ---------------------------------------------------------------
+export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
+export CLICOLOR=1
+
+
+## Colour ---------------------------------------------------------------------
+## In order to avoid "tput: No value for $TERM and no -T specified:" error
+## replace "tput" with "tty -s && tput"
+## Solarized colour palette ---------------------------------------------------
+_r=$(tty -s && tput setaf 1); _rbg=$(tty -s && tput setab 1)  # red
+_g=$(tty -s && tput setaf 2); _gbg=$(tty -s && tput setab 2)  # green
+_b=$(tty -s && tput setaf 4); _bbg=$(tty -s && tput setab 4)  # blue
+_c=$(tty -s && tput setaf 6); _cbg=$(tty -s && tput setab 6)  # cyan
+_m=$(tty -s && tput setaf 5); _mbg=$(tty -s && tput setab 5)  # magenta
+_y=$(tty -s && tput setaf 3); _ybg=$(tty -s && tput setab 3)  # yellow
+_k=$(tty -s && tput setaf 0); _kbg=$(tty -s && tput setab 0)  # black
+_w=$(tty -s && tput setaf 7); _wbg=$(tty -s && tput setab 7)  # white
+NC=$(tty -s && tput sgr0)                                     # no colour
+
+## Text decoration ------------------------------------------------------------
+underon=$(tty -s && tput smul);     underoff=$(tty -s && tput rmul)
+alloff=$(tty -s && tput sgr0);      bold=$(tty -s && tput smso)
+blinkon=$(tty -s && tput blink);    revon=$(tty -s && tput rev)
+BOLD=$(tty -s && tput bold);        NORM=$(tty -s && tput sgr0)
+
+## Date and Time (UTC) --------------------------------------------------------
+# unset _h _m _s
+# eval $(date -u "+_h=%H ;_m=%M ;_s=%S")
+# ((SECONDS = 3600*${_h#0}+60*${_m#0}+${_s#0}))
+# _tsub="(_m=(SECONDS/60%60)) == (_h=(SECONDS/3600%24)) + (_s=(SECONDS%60))"
+# _timehm='${_x[_tsub]}$(printf "%02d" $_h):$(printf "%02d" ${_m})'
+
+## User Prompt ----------------------------------------------------------------
+# PS1="\[$yellow\]\[$BOLD\]\u@\h:\[$white\]\w\n\[$cyan\]$_timehm\[${NC}\] "
+# PS1='$BOLD\[$yellow\]\u@\h:$white\w\n\[$cyan\]\D{%T}\[$NC\] '
+PS1='$BOLD${_y}\u${_m}@${_y}\h${_m}:${_w}$(pwd)\n\[$_c\]\$\[$NC\] '
+
+## Debug prompt (use PS4 and `set -x` in specific script instead)
+# export PS4='$0#$LINENO+ '
+# export PS4='[\D{%FT%T%z}] \u@\h+ '
+
+## Record history
+export HISTCONTROL=ignoredups:ignorespace
+export HISTIGNORE="ll:ls:l:h"

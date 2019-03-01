@@ -1,0 +1,22 @@
+## Yaswant Pradhan's inputrc
+## Include any system-wide bindings and variable assignments from /etc/Inputrc
+# $include /etc/inputrc
+
+## bash completion settings (actually, these are readline settings) -----------
+## See http://ss64.com/bash/syntax-inputrc.html
+set completion-ignore-case On
+set bell-style none
+set show-all-if-ambiguous On
+set expand-tilde On
+
+## Hide hidden files
+#set match-hidden-files Off
+
+## Hide Display all N possibiliries
+set completion-query-items 0
+set page-completions On
+
+## Ctrl+left-arrow or right-arrow to move one word backward or forward
+## Press Ctrl+v then sequence to see the bindings
+"\e[1;5D" backward-word
+"\e[1;5C" forward-word

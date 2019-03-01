@@ -1,0 +1,20 @@
+@html2ps { paper { type: A4 } }
+BODY{
+    font-size: 10pt;
+    font-family: Helvetica;
+    text-align: justify;
+}
+H1{ font-size: 16pt }
+H2{ font-size: 15pt }
+H3{ font-size: 14pt }
+H4{ font-size: 13pt }
+H5{ font-size: 12pt }
+H6{ font-size: 11pt }
+TH{ text-decoration: line-through }
+A:link{ color: #0055aa }
+@page{
+    margin-left: 2cm;
+    margin-right: 2cm;
+    margin-top: 4cm;
+    margin-bottom: 2cm;
+}

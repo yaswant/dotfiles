@@ -1,0 +1,14 @@
+// config file for HTML tidy (env HTML_TIDY)
+clean: yes
+drop-proprietary-attributes: yes
+drop-empty-paras: yes
+force-output: yes
+input-encoding: utf8
+join-classes: yes
+join-styles: yes
+output-html: yes
+output-encoding: utf8
+//show-body-only: yes
+show-warnings: no
+vertical-space: no
+wrap: 0

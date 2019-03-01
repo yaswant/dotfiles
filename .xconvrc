@@ -1,0 +1,59 @@
+#
+#  Xconv will use this file to override defaults
+#
+
+set cursor "left_ptr"
+set fixedfont "-b&h-lucidatypewriter-medium-r-*-*-12-120-*-*-*-*-iso8859-1"
+set butfont "-b&h-lucidatypewriter-medium-r-*-*-12-120-*-*-*-*-iso8859-1"
+set plotfont "-*-Helvetica-Medium-R-Normal--*-140-*-*-*-*-*-*"
+set scrollbarwidth "11"
+set foregroundcolour "black"
+set activeforegroundcolour "black"
+set selectforegroundcolour "black"
+set backgroundcolour "wheat"
+set activebackgroundcolour "#efefef"
+set selectbackgroundcolour "#bfdfff"
+set disablecolour "#a3a3a3"
+set redirout "true"
+set fixvcsbug "yes"
+set byteswap64 "yes"
+set initialoutputformat "netcdf"
+set chmdi "yes"
+set mdival "2.0e20"
+set ncprec "32"
+set ncoformat "0"
+set grotype "0"
+set griblib "0"
+set red_gauss_conv "1"
+set umtime "fixed"
+set umtitle "stash"
+set fieldtitle "long"
+set gribsubmodel "1"
+set gribversion "5.5"
+set smdirName "~"
+set smfilelist "
+               ~/STASHMASTER_link_A
+               ~/STASHMASTER_link_O
+               ~/STASHMASTER_link_S
+               ~/STASHMASTER_link_W
+               "
+catch {setvaratt  long_name units missing_value _Fillvalue source name title date time north_pole valid_min valid_max grid_mapping att_use}
+catch {setvaratt  valid_range short_name axis att_nouse}
+catch {setvaratt  standard_name coordinates att_cond}
+catch {setdimatt  long_name units time_origin positive att_use}
+catch {setdimatt  axis month_lengths att_nouse}
+catch {setdimatt  point_spacing modulo_ferret calendar standard_name att_cond}
+catch {setglobatt  history att_use}
+catch {setglobatt  Conventions title institution source references comment att_nouse}
+set glob_history_text ""
+set glob_Conventions_text ""
+set glob_title_text ""
+set glob_institution_text ""
+set glob_source_text ""
+set glob_references_text ""
+set glob_comment_text ""
+set xsize 937
+set ysize 707
+
+# User additions should go below the following line
+#### %%%%%%%%%%%%%%%% ---------------- %%%%%%%%%%%%%%%% ####
