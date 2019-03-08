@@ -28,6 +28,7 @@
 # folder.
 # 
 # (swap-path "${gimp_dir}")
+ (swap-path "${TMPDIR}/${USER}")
 
 # Sets how many processors GIMP should try to use simultaneously.  This is an
 # integer value.
