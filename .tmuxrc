@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export LOAD_BASHIT=0
+[ -f ~/.bashrc ] && source ~/.bashrc
+
