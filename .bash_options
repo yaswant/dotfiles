@@ -1,44 +1,178 @@
-## Grep colours ---------------------------------------------------------------
+## [ba]sh options
+## yaswant.pradhan
+## To enable bash_it (1) (aliased as ibash):
+# LOAD_BASHIT=1 && source ~/.bashrc
+LOAD_BASHIT=${LOAD_BASHIT:-0}
+
+
+# Expand directory environment (backward compatible) --------------------------
+# to avoid an extra escape before tab-completion
+if ((BASH_VERSINFO[0] >= 4)) && ((BASH_VERSINFO[1] >= 2)); then
+  shopt -s direxpand
+fi
+
+# Grep colours ----------------------------------------------------------------
 export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
 export CLICOLOR=1
 
+## Record history -------------------------------------------------------------
+export HISTCONTROL=ignoredups:ignorespace
+export HISTIGNORE="ll:ls:l:h"
+
 
 ## Colour ---------------------------------------------------------------------
-## In order to avoid "tput: No value for $TERM and no -T specified:" error
-## replace "tput" with "tty -s && tput"
-## Solarized colour palette ---------------------------------------------------
-_r=$(tty -s && tput setaf 1); _rbg=$(tty -s && tput setab 1)  # red
-_g=$(tty -s && tput setaf 2); _gbg=$(tty -s && tput setab 2)  # green
-_b=$(tty -s && tput setaf 4); _bbg=$(tty -s && tput setab 4)  # blue
-_c=$(tty -s && tput setaf 6); _cbg=$(tty -s && tput setab 6)  # cyan
-_m=$(tty -s && tput setaf 5); _mbg=$(tty -s && tput setab 5)  # magenta
-_y=$(tty -s && tput setaf 3); _ybg=$(tty -s && tput setab 3)  # yellow
-_k=$(tty -s && tput setaf 0); _kbg=$(tty -s && tput setab 0)  # black
-_w=$(tty -s && tput setaf 7); _wbg=$(tty -s && tput setab 7)  # white
-NC=$(tty -s && tput sgr0)                                     # no colour
+if tty -s; then
+  # -- foreground colours
+  _k=$(tput setaf 0)          # Black
+  _r=$(tput setaf 1)          # Red
+  _g=$(tput setaf 2)          # Green
+  _y=$(tput setaf 3)          # Yellow
+  _b=$(tput setaf 4)          # Blue
+  _m=$(tput setaf 5)          # Magenta
+  _c=$(tput setaf 6)          # Cyan
+  _w=$(tput setaf 7)          # White
+  _nc=$(tty -s && tput sgr0)  # No Colour
 
-## Text decoration ------------------------------------------------------------
-underon=$(tty -s && tput smul);     underoff=$(tty -s && tput rmul)
-alloff=$(tty -s && tput sgr0);      bold=$(tty -s && tput smso)
-blinkon=$(tty -s && tput blink);    revon=$(tty -s && tput rev)
-BOLD=$(tty -s && tput bold);        NORM=$(tty -s && tput sgr0)
+  # -- background colours
+  # _kb=$(tput setab 0); _rb=$(tput setab 1); _gb=$(tput setab 2)
+  # _yb=$(tput setab 3); _bb=$(tput setab 4); _mb=$(tput setab 5)
+  # _cb=$(tput setab 6); _wb=$(tput setab 7);
+
+  # -- text decoration
+  # underon=$(tput smul); underoff=$(tput rmul)
+  # alloff=$(tput sgr0); NORM=$(tput sgr0); NC=$(tput sgr0) # No Colour
+  # bold=$(tput smso); BOLD=$(tput bold)
+  # blinkon=$(tput blink); revon=$(tput rev)
+fi
+
+
+
 
 ## Date and Time (UTC) --------------------------------------------------------
 # unset _h _m _s
 # eval $(date -u "+_h=%H ;_m=%M ;_s=%S")
 # ((SECONDS = 3600*${_h#0}+60*${_m#0}+${_s#0}))
 # _tsub="(_m=(SECONDS/60%60)) == (_h=(SECONDS/3600%24)) + (_s=(SECONDS%60))"
-# _timehm='${_x[_tsub]}$(printf "%02d" $_h):$(printf "%02d" ${_m})'
+# _thm='${_x[_tsub]}$(printf "%02d" $_h):$(printf "%02d" ${_m})'
+# _utc='${_x[_tsub]}$(printf "%02d" $_h):$(printf "%02d" ${_m}):$(printf "%02d" ${_s})'
 
-## User Prompt ----------------------------------------------------------------
-# PS1="\[$yellow\]\[$BOLD\]\u@\h:\[$white\]\w\n\[$cyan\]$_timehm\[${NC}\] "
-# PS1='$BOLD\[$yellow\]\u@\h:$white\w\n\[$cyan\]\D{%T}\[$NC\] '
-PS1='$BOLD${_y}\u${_m}@${_y}\h${_m}:${_w}$(pwd)\n\[$_c\]\$\[$NC\] '
 
-## Debug prompt (use PS4 and `set -x` in specific script instead)
+## Debug prompt (use PS4 and `set -x` in specific script instead) -------------
 # export PS4='$0#$LINENO+ '
 # export PS4='[\D{%FT%T%z}] \u@\h+ '
 
-## Record history
-export HISTCONTROL=ignoredups:ignorespace
-export HISTIGNORE="ll:ls:l:h"
+# [sa|sci]tools environment indicator for PS1 ---------------------------------
+__tools_ps1()
+{
+  # Check if scitools or satools environments are loaded, and return the last
+  # loaded module. note: scitools can override satools, and may be loaded in
+  # conjunction but not the other way around.
+  # Get the last loaded module with pattern "tools"
+  TOOLS=
+
+  # TOOLS=($(grep tools <(printf "%s\n" ${LOADEDMODULES//:/ })))  # gnu-bash
+  # TOOLS=($(tr ":" "\n" <<< $LOADEDMODULES | grep tools))        # POSIX
+  # (( ${#TOOLS} )) && printf " (${TOOLS[@]: -1})"
+
+  if [[ $POSIXLY_CORRECT == y ]]; then  ## POSIX sh
+    TOOLS=($(tr ":" "\n" <<< $LOADEDMODULES | grep tools))
+  else  ## bash
+    TOOLS=$(grep tools <(tr ":" "\n" <<< $LOADEDMODULES) | tail -1)
+  fi
+  [[ $TOOLS ]] && printf "${_c} ($TOOLS)"
+}
+
+
+# SVN status for PS1 ----------------------------------------------------------
+__svn_ps1()
+{
+  # Return [branch status-symbol]
+  # status-symbols are in line with __git_ps1 and as below:
+  # =  no difference to remote
+  #  * tracked file was modified
+  #  + tracked file was staged for next commit (svn|fcm add)
+  #  % untracked files in your tree (new file created)
+
+  # -- is svn available and current directory tree is svn working copy
+  svn info --depth=empty &>/dev/null || return
+  local SVN_BRANCH=$(svn info --show-item=url 2>/dev/null | awk -F/ '{ for (i=0; i<=NF; i++) {if ($i == "branches" || $i == "tags" ){printf "%s:%s",$(i+1),$(i+3); break}; if ($i == "trunk"){print $i; break}} }') || return
+  # local SVN_REVISION=$(svn info --show-item=revision 2>/dev/null)
+
+  local SVN_STAT=
+  local TSTAT=
+  # mapfile -t SVN_STAT < <(svn status)  # -- gnu-bash
+  # (( `grep -c "^M" < <(printf "%s\n" ${SVN_STAT[@]})` )) && local TSTAT+="${_r}*"
+  # (( `grep -c "^?" < <(printf "%s\n" ${SVN_STAT[@]})` )) && local TSTAT+="${_r}%"
+  # (( `grep -c "^A" < <(printf "%s\n" ${SVN_STAT[@]})` )) && local TSTAT+="${_r}+"
+
+  # limit operations on status: show chenges in immediate folder only to speed up prompt
+  # --depth files|immediates
+  #SVN_STAT=$(svn status)  # to comply with POSIX
+  SVN_STAT=$(svn status --depth=immediates)  # to comply with POSIX
+  (( $(echo "${SVN_STAT[@]}" | grep -c "^M") )) && TSTAT+="${_r}*"
+  (( $(echo "${SVN_STAT[@]}" | grep -c "^?") )) && TSTAT+="${_r}%"
+  (( $(echo "${SVN_STAT[@]}" | grep -c "^A") )) && TSTAT+="${_r}+"
+  (( $(echo "${SVN_STAT[@]}" | grep -c "^D") )) && TSTAT+="${_r}-"
+
+  [[ $TSTAT ]] && TSTAT=" $TSTAT"
+  local STAT="${TSTAT}${_nc}="
+  echo " ${_nc}(${_g}${SVN_BRANCH}${_nc}${STAT})" # -- branch and status
+  # echo " ${_nc}[${SVN_REVISION}${STAT}]"        # -- revision and status
+}
+
+
+# Custom function for PROMPT_COMMAND with non-zero exit status ----------------
+__prompt_command()
+{
+  local EXIT="$?"  # capture exit status: must be the first line in function
+
+  PS1=()
+  local ERR=
+  [ $EXIT != 0 ] && ERR="${_r}${EXIT}\n"
+
+  # UTC time stamps? uncomment definitions above first
+  # PS1="${_y}${_utc} "
+
+  # # keep colour codes consistent for git and fcm/svn repositories
+  _wd=$(pwd); _wd=${_wd/net\//}
+  local CWD="${_g}\u${_w}@${_g}\h${_w}:${_w}${_wd}"
+
+  if [[ $CONDA_DEFAULT_ENV ]]; then
+    local CONDA_ENV=${_m}'<'$(basename "$CONDA_DEFAULT_ENV")'> '
+  fi
+
+  if [ -s /usr/share/git-core/contrib/completion/git-prompt.sh ]; then
+    # git status on prompt (fedoraproject.org/wiki/Git_quick_reference)
+    source /usr/share/git-core/contrib/completion/git-prompt.sh
+    export GIT_PS1_SHOWDIRTYSTATE=true
+    export GIT_PS1_SHOWSTASHSTATE=true
+    export GIT_PS1_SHOWUPSTREAM="auto"
+    export GIT_PS1_SHOWUNTRACKEDFILES=true
+    export GIT_PS1_SHOWCOLORHINTS=true
+    # __git_ps1 "${ERR}${_y}\t$(__tools_ps1) ${CWD}${_nc}" ""
+    __git_ps1 "${ERR}${_y}\t$(__tools_ps1) ${CONDA_ENV}${CWD}$(__svn_ps1)${_nc}" ""
+  else
+    PS1+="${ERR}${_y}\t$(__tools_ps1) ${CONDA_ENV}${CWD}$(__svn_ps1)${_nc}"
+  fi
+  PS1+='\n\$ '
+}
+
+
+# interactive stuff -----------------------------------------------------------
+if [[ $- =~ i ]]; then
+
+  # tab-completions
+  ## rose/cylc bash completion ### DONT export ROSE_HOME ###
+  [ -s ~fcm/rose/etc/rose-bash-completion ] && . ~fcm/rose/etc/rose-bash-completion
+  [ -s ~fcm/cylc/conf/cylc-bash-completion ] && . ~fcm/cylc/conf/cylc-bash-completion
+
+  ## Load prompt
+  if (( LOAD_BASHIT )); then
+    # bash-it PowerLine prompt (requires bash-it: github.com/Bash-it/bash-it)
+    [ -s ~/.bashitrc ] && source ~/.bashitrc
+  else
+    # my custom prompt
+    PROMPT_COMMAND=__prompt_command
+  fi
+
+fi

@@ -2,21 +2,44 @@
 ## Include any system-wide bindings and variable assignments from /etc/Inputrc
 # $include /etc/inputrc
 
-## bash completion settings (actually, these are readline settings) -----------
-## See http://ss64.com/bash/syntax-inputrc.html
-set completion-ignore-case On
+# bash completion settings (actually, these are readline settings) ------------
+# See http://ss64.com/bash/syntax-inputrc.html
+set completion-ignore-case on
 set bell-style none
-set show-all-if-ambiguous On
-set expand-tilde On
+set show-all-if-ambiguous on
+set expand-tilde on
+# on menu-complete, first display the common prefix, then cycle through the
+# options when hitting TAB
+set menu-complete-display-prefix on
 
-## Hide hidden files
+# Hide hidden files
 #set match-hidden-files Off
 
-## Hide Display all N possibiliries
+# Hide Display all N possibiliries
 set completion-query-items 0
-set page-completions On
+set page-completions on
 
-## Ctrl+left-arrow or right-arrow to move one word backward or forward
-## Press Ctrl+v then sequence to see the bindings
-"\e[1;5D" backward-word
+
+$if mode=emacs
+# Ctrl+A                    goto begining of line
+# Ctrl+Del or Alt+D         clear one word after cursor
+# Ctrl+E                    goto end of line
+# Ctrl+K or Ctrl+Shift+Del  clear all after cursor
+# Ctrl+left-arrow           move one word backward
+# Ctrl+right-arrow          move one word forward
+# Ctrl+U                    clear all before cursor
+# Ctrl+W                    clear one word before cursor
+# Ctrl+Y                    recall deleted line
+# Ctrl+XX                   switch between start [^A] and current cursor position
+# Press Ctrl+v then ctrl sequence to see the bindings
+
 "\e[1;5C" forward-word
+"\e[1;5D" backward-word
+"\e[3;5~" kill-word
+"\e[3;6~" kill-line
+$endif
+
+
+$if mode=vi
+set keymap vi-command
+$endif

@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
-export LOAD_BASHIT=0
-[ -f ~/.bashrc ] && source ~/.bashrc
+# shellcheck disable=SC1090,SC2148
+# yaswant.pradhan
 
+# export LOAD_BASHIT=1
+[ -s ~/.bashrc ] && source ~/.bashrc

@@ -10,7 +10,7 @@ if has('gui_running')
 	set lines=50 columns=90
 	set guifont=Fira\ Mono
 else
-	colorscheme slate "solarized adrian
+	colorscheme pablo "slate "solarized adrian
 endif
 set ts=4			" tab spaces
 set shiftwidth=4	" how many spaces back I go when doing a backtab
@@ -21,7 +21,7 @@ set ffs=unix        " display CR (^M)
 set encoding=utf-8
 set fileencoding=utf-8
 set listchars=eol:¶ " show end-of-line character
-set list
+"set list
 
 " To include ctrl chars, INS mode Ctrl+V, followed by Ctrl+<key> of Alt+<key>
 "  = Ctrl+x
@@ -70,8 +70,11 @@ hi clear SpellBad
 hi SpellBad cterm=underline ctermfg=red
 hi SpellBad gui=undercurl guifg=red
 
-" Toggles <Leader> is mapped to \ key
+
+" Toggles (note: <Leader> is mapped to \ key on the keyboard)
 map <F6> :setlocal spell! spelllang=en_gb<CR>   " SpellCheck
 map <F12> :setlocal nu!<CR>                     " LineNumber
-:nnoremap <Leader>c :set cursorline!<CR>        " highligh line
+:nnoremap <Leader>c :set cursorline!<CR>        " highlight line
+nnoremap <F3> :set list!<CR>                    " display unprintable characters
+
 

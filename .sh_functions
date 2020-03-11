@@ -1,0 +1,159 @@
+# shellcheck disable=SC2148
+### .sh_functions for [ba|z|k]sh
+### yaswant.pradhan
+
+# settitle(){  ## show scitools module in tmux title
+#  local name=$(module list 2>&1 | grep -o 'scitools/.*' || echo None);
+#  tmux rename-window "${name##scitools/}";
+# }
+# PROMPT_COMMAND=settitle
+export PATH="$PATH:~/Repos/weatherx"
+
+# -- Explain bash command
+explain(){
+  # If using this command gives no output, see if running a
+  # simple fetch causes this error:
+  # $ curl https://www.mankier.com
+  # curl: (35) Cannot communicate securely with peer: no common encryption
+  # algorithm(s). If so, try specifying a cipher in the curl commands:
+  # curl --ciphers ecdhe_ecdsa_aes_128_sha
+  if [ "$#" -eq 0 ]; then
+    while read -rp "Command: " cmd; do
+      curl -Gs "https://www.mankier.com/api/explain/?cols=$(tput cols)" \
+           --data-urlencode "q=$cmd"
+    done
+    echo "Bye!"
+  elif [ "$#" -eq 1 ]; then
+    curl -Gs "https://www.mankier.com/api/explain/?cols=$(tput cols)" \
+         --data-urlencode "q=$1"
+  else
+    echo "Usage"
+    echo "explain                  interactive mode."
+    echo "explain 'cmd -o | ...'   one quoted command to explain it."
+  fi
+}
+
+# -- Validate a URL
+test_url(){
+  URL="$1"
+  curl --output /dev/null --silent --head --fail -L "$URL"; rc=$?
+  (( "$rc" == 0 )) || { echo "Error: $rc -> $URL"; return $rc;}
+}
+
+# -- create dir and go
+md(){ mkdir -p "$1" && cd "$1" || return $?; }
+
+# -- backup file
+backup(){ cp -i "$1"{,.bak}; }
+
+# -- md5sum file key
+md5check(){ md5sum "$1" | grep "$2"; }
+
+# -- number of lines in a file
+nlines(){ sed -n '$=' "$1"; }
+nlin(){ awk '{c++}END{print c}' "$1"; }
+
+# -- number of items in a folder/cwd
+nf(){ /bin/ls -1 "${1:-$(pwd)}" | wc -l; }
+
+# -- find file with matching pattern
+fp(){ find . -type f -iname '*'"$*"'*' -ls; }
+
+# -- find files with pattern (1) and execute (2)
+fex(){ find . -type f -iname '*'"${1:-}"'*' -exec "${2:-file}" {} \;; }
+
+# -- itemised disc usage
+dus(){
+  pth=("$@")
+  [ -z "${pth[0]}" ] && pth[0]=$(pwd)
+  for i in "${pth[@]}"; do
+    find "$i" -maxdepth 1 -exec du -sh --apparent {} \; 2>/dev/null | sort -h
+  done
+}
+
+dus1(){
+  find "$@" -maxdepth 1 -exec du -sh --apparent {} \; 2>/dev/null | sort -h
+}
+
+dus2(){
+  find "$@" -maxdepth 2 -exec du -sh --apparent {} \; 2>/dev/null | sort -h
+}
+
+dudirs(){
+  find "$@" -maxdepth 1 -type d -exec du -sh --apparent {} \; 2>/dev/null \
+  | sort -h
+}
+
+# -- disk usage by top-level directories
+dudir(){ du -h --apparent -d 1 "${@:-$(pwd)}" 2>/dev/null | sort -h; }
+
+# -- draw a character ($2) N times ($1). syn: line [n [char]]
+line(){ n=${1:-79}; c=${2:--}; printf %"${n}"s | tr " " "$c"; echo; }
+
+# -- change file-names to lower-case
+lowercase(){
+  for file ; do
+    filename=${file##*/}
+    case "$filename" in
+      */*) dirname=${file%/*} ;;
+      *) dirname=.;;
+    esac
+    nf=$(echo "$filename" | tr '[:upper:]' '[:lower:]')
+    newname="${dirname}/${nf}"
+    if [ "$nf" != "$filename" ] && [ ! -d "$newname" ]; then
+      echo "lowercase: $file --> $newname"
+      mv -i "$file" "$newname"
+    else
+      [ -d "$newname" ] && echo "$newname directory exists."
+      echo "lowercase: $file not changed."
+    fi
+  done
+}
+
+# -- vim as syntax highlighting pager (like less)
+r(){
+  # vim +"set tabstop=4" -u /usr/share/vim/vim74/macros/less.vim "$@"
+  [ -d $1 ] && ls -1 $1 || vim -u "${HOME}/.vim/macros/less.vim" "$@"
+}
+
+# -- find ignoring stderr
+f_(){ find "$@" 2>&1 | grep -vi 'permission denied'; }
+
+# -- get IP address of host machine
+IP(){ ifconfig | awk '/inet/ && /broadcast/ {print $2}'; }
+
+warn(){ echo "$0:" "$@" >&2; }
+
+# -- exit with error-code. syn: test || die $? "message"
+die(){
+  rc=${1:-1}
+  shift
+  warn "$@"
+  exit "$rc"
+}
+
+# -- current user processes
+myps(){ ps "$@" -u "$USER" -o pid,%cpu,%mem,bsdtime,command; }
+pp(){ myps f | awk '!/awk/ && $0~var' var="${1:-.*}"; }
+
+# -- top processes by cpu usage
+ppc(){
+  echo "   PID %CPU %MEM   TIME COMMAND"
+  pp "$@" | grep -v PID | sort -k2 -h
+}
+
+# -- top processes by memory usage.
+ppm(){
+  echo "   PID %CPU %MEM   TIME COMMAND"
+  pp "$@" | grep -v PID | sort -k3 -h
+}
+
+# -- go back n directories up. syn: up [N]
+up(){ for _ in $(seq 1 $1); do cd ..; done; }
+
+# -- kernel graph
+kernelgraph(){
+  lsmod \
+  | perl -e 'print "digraph \"lsmod\" {";<>;while(<>){@_=split/\s+/; print "\"$_[0]\" -> \"$_\"\n" for split/,/,$_[3]}print "}"' \
+  | dot -Tpng | display -;
+}
