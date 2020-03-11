@@ -1,0 +1,18 @@
+[user]
+    name = yaswant
+    email = ******
+
+# diff tool
+[diff]
+    tool = xxdiff
+[difftool]
+    prompt = false
+[difftool "xxdiff"]
+    cmd = xxdiff "$LOCAL" "$REMOTE"
+[credential]
+    helper = store --file ~/.git-credentials
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true

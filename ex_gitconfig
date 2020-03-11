@@ -1,4 +1,4 @@
-https://gist.github.com/pksunkara/988716
+after https://gist.github.com/pksunkara/988716
 [user]
 	name = Name
 	email = em@gmail.com
@@ -10,7 +10,7 @@ https://gist.github.com/pksunkara/988716
 [sendemail]
 	smtpencryption = tls
 	smtpserver = smtp.gmail.com
-	smtpuser = pavan.sss1991@gmail.com
+	smtpuser = e.m@gmail.com
 	smtppass = password
 	smtpserverport = 587
 [web]
@@ -43,7 +43,7 @@ https://gist.github.com/pksunkara/988716
 [difftool]
 	prompt = false
 [github]
-	user = pksunkara
+	user = gitusername 
 	token = token
 [gitflow "prefix"]
 	feature = feature-
